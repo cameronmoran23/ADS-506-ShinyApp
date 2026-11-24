@@ -44,3 +44,24 @@ fill_missing <- function(wines) {
         ungroup() |>
         select(-left, -right)
 }
+
+filter_wines <- function(wines, varietals, start, end) {
+    # filter wines dataframe by data range and varietals
+    wines |>
+        filter(Varietal %in% varietals,
+               Month >= yearmonth(start),
+               Month <= yearmonth(end))
+}
+
+# STEP 2: Split
+
+# split the data into a training window (up to and including train_end)
+# and a validation window (everything after train_end)
+split_wines <- function(wines, train_end) {
+    # convert train_end to yearmonth and partition the data into train and validation sets
+    train_end <- yearmonth(train_end)
+    list(
+        train = wines |> filter(Month <= train_end),
+        valid = wines |> filter(Month > train_end)
+    )
+}
