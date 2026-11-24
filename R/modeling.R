@@ -86,3 +86,16 @@ fit_models <- function(train, models = c("TSLM", "ETS", "ARIMA"), log_transform 
     # fit the selected models to every varietal
     do.call(model, c(list(train), model_specs[models]))
 }
+
+# STEP 4: Forecast
+
+# forecast the validation data for the fitted models
+forecast_validation <- function(fitted_models, valid) {
+    forecast(fitted_models, new_data = valid)
+}
+
+# refit on selected data and forecast the next h months
+forecast_future <- function(data, models, log_transform = FALSE, h = 12) {
+    fit_models(data, models, log_transform) |>
+        forecast(h = h)
+}
