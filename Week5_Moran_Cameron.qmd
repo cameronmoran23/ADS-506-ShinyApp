@@ -12,7 +12,6 @@ execute:
   warning: false
   message: false
 ---
-
 ## Part I — Links and Description
 
 - **Deployed Shiny App URL:** <https://cameronmoran23.shinyapps.io/aus-wine-forecaster/>
@@ -33,21 +32,24 @@ execute:
 
 ## Part II — Data Story
 
+**Insight:** Fortified and Rosé wines are two varietals that are in a decline. Annual sales for these wines fell 40% and 67% respectively between 1980 and 1994. Using a log transformation provides much more accurate forecasts for these varietals where the best model for Fortified dropped from 274.72 to 248.31 RMSE and Rosé's RMSE dropped from 8.44 to 5.04. 
 
+**Why It Matters:** This insight matters because it indicates a clear consumer behavior trend that can be used to inform future business decisions. Wine producers and retailers can utilize this information to adjust their production and marketing strategies for these two varietals. In addition, the log transformation being able to improve forecasts for these varietals is even more useful to these groups because it allows them to more accurately forecast their production and inventory needs. This can help reduce waste and increase profitability by being able to more closely match supply with demand.
 
-```{=html}
-<!-- Insight (2–3 sentences, concise)
-State your key finding and why it matters. Example: “Sparkling shows consistent December spikes; ETS(M,A,M) outperforms ARIMA on validation RMSE, so it’s the more reliable seasonal model for forward planning.” -->
-```
+**Evidence:** 
 
-```{=html}
-<!-- Evidence (screenshots + narrative + minimal tables) 
-Insert screenshots from your app that support your insight. Use short, descriptive captions and list the app inputs so we can reproduce each figure. -->
-```
+![**Log-transform off.** Validation RMSE, MAE and MAPE for 1993–94.](figures/regular_table.png){width=70% fig-align="center"}
 
-```{=html}
-<!-- Optional references section (remove if not used). To use APA, add a CSL file and bibliography in your project and uncomment below.
+![**Log-transform on.** Validation RMSE, MAE and MAPE for 1993–94. Every model's RMSE improves for both varietals.](figures/log_table.png){width=70% fig-align="center"}
+
+*To reproduce both tables, use these settings in the sidebar:*
+- Varietals = Fortified, Rose
+- Date Range = Jan 1980–Dec 1994
+- Training Ends = Dec 1992
+- Models = TSLM, ETS, ARIMA
+- click Fit Models -> Accuracy Metrics Tab -> Validation Metrics table
+- For the second table, tick Log-Transform Data and click Fit Models again
+
 # References
--->
-```
-# References
+
+Wickham, H. (2021). *Mastering Shiny: Build interactive apps, reports, and dashboards powered by R*. O'Reilly Media. <https://mastering-shiny.org/index.html>
