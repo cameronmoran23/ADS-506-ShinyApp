@@ -1,5 +1,5 @@
-# TODO: Add description
-
+# This file contains the functions for loading, wrangling, modeling, forecasting, and evaluating the Australian wine sales data.
+# The functions are used by the app.R file to create the Shiny app.
 
 # STEP 1: Load & Wrangle
 
@@ -19,11 +19,11 @@ load_wines <- function(filepath = file.path("data", "AustralianWines.csv")) {
             pivot_longer(-Month, names_to = "Varietal", values_to = "Sales") |>
             mutate(
                 # Capitalise first letter of varietals
-                Varietal = paste0(toupper(substr(Varietal, 1, 1)), substring(Varietal, 2)),
+                Varietal = paste0(toupper(substr(Varietal, 1, 1)), substring(Varietal, 2))
             ) |>
             as_tsibble(index = Month, key = Varietal)
 
-        fill_missing(wines)
+    fill_missing(wines)
 }
 
 
@@ -167,10 +167,7 @@ spec_table <- function(fitted_models) {
 
 # STEP 7: Visualize
 
-# forecasts with prediction-interval ribbons
-# fc: a fable (from forecast_validation or forecast_future)
-# history: the actual data to draw behind the forecasts
-# layout: "side" = one column per model, "overlay" = all models in one panel per varietal
+# forecasts with prediction-intervals
 plot_forecasts <- function(forecasts, history, level = 95) {
     forecasts |>
         autoplot(history, level = level) +

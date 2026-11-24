@@ -25,7 +25,7 @@ with_tip <- function(label, text) {
 ui <- page_navbar(
     title  = "Australian Wine Forecaster",
     theme  = bs_theme(bootswatch = "flatly"),
-    fillable = FALSE, # do not let cards grow to fit their plots
+    fillable = FALSE, # let cards grow to fit their plots
     header = useBusyIndicators(), # spinner for loading
 
     sidebar = sidebar(
@@ -44,57 +44,47 @@ ui <- page_navbar(
                     with_tip("Training Ends", "Models learn from data up to this month. Months after are used for the validation set."),
                     min = add_months(DATE_MIN, MIN_TRAIN - 1), max = add_months(DATE_MAX, -MIN_VALID),
                     value = as.Date("1992-12-01"), timeFormat = "%b %Y"),
+        # forecast horizon slider (months)
         sliderInput("h",
-                    with_tip("Forecast horizon (months)", "How far past the end of the date range to forecast."),
+                    with_tip("Forecast Horizon (months)", "How far past the end of the date range to forecast."),
                     min = 1, max = 36, value = 12),
+        # model checkboxes
         checkboxGroupInput("models",
                            with_tip("Models", "TSLM = linear trend + monthly seasonality. ETS = exponential smoothing. ARIMA = autoregressive integrated moving average. ETS and ARIMA forms are chosen automatically."),
                            choices = c("TSLM", "ETS", "ARIMA"),
                            selected = c("TSLM", "ETS", "ARIMA"), inline = TRUE),
+        # checkbox for log-transforming sales
         checkboxInput("log_transform",
-                      with_tip("Log-transform sales", "Fit models to log(Sales). Helps when seasonal swings grow or shrink with the sales level. Forecasts are shown on the original scale."),
+                      with_tip("Log-Transform Data", "Fit models to log(Sales). This can improve accuracy when seasonal swings scale with the sales level."),
                       value = FALSE),
+        # radio buttons for prediction interval
         radioButtons("level",
-                     with_tip("Prediction interval", "Width of the shaded band around each forecast."),
+                     with_tip("Prediction Interval", "Width of the shaded band around each forecast."),
                      choices = c("80%" = 80, "95%" = 95), selected = 95, inline = TRUE),
-        actionButton("fit", "Fit models", icon = icon("play"), class = "btn-primary"),
-        helpText("Change the settings, then click Fit models to update the Model specs, Accuracy and Forecasts tabs.")
+        # action button to fit models
+        actionButton("fit", "Fit Models", icon = icon("play"), class = "btn-primary"),
+        helpText("Change the settings, then click Fit Models to update the Model Specifications, Accuracy Metrics, and Forecasts tabs.")
     ),
 
-    # ---- Explore ----
+    # Explore Tab
     nav_panel("Explore",
         card(
-            card_header("Sales over time"),
+            card_header("Sales Over Time"),
             plotOutput("ts_plot", height = "450px"),
             card_footer("Dashed line = end of training. Everything after it is the validation window.")
-        ),
-        card(
-            card_header("Seasonality (one line per year)"),
-            plotOutput("season_plot", height = "450px")
         )
     ),
 
-    # ---- Model specs ----
-    nav_panel("Model specs",
+    # Model Specs Tab
+    nav_panel("Model Specifications",
         card(
-            card_header("Automatically selected models (fitted on the training window)"),
+            card_header("Model Information"),
             tableOutput("spec_table")
-        ),
-        card(
-            card_header("How to read the notation"),
-            markdown("
-* **ETS(Error, Trend, Season)**: each letter is **N** (none), **A** (additive), **Ad** (damped additive) or **M** (multiplicative).
-  Example: ETS(M,A,M) = multiplicative errors, additive trend, and seasonal swings that grow with the level of sales.
-  *alpha*, *beta* and *gamma* are smoothing weights for the level, trend and season (near 0 = changes slowly).
-* **ARIMA(p,d,q)(P,D,Q)[12]**: *p/P* autoregressive terms, *d/D* differences, *q/Q* moving-average terms;
-  capital letters are the seasonal (12-month) part. *drift* = a steady long-run trend.
-* **TSLM**: a regression on a straight-line trend plus a separate effect for each calendar month.
-* **AICc** compares models **within the same model type only**. Use the Accuracy tab to compare across types.")
         )
     ),
 
-    # ---- Accuracy ----
-    nav_panel("Accuracy",
+    # Accuracy Metrics Tab
+    nav_panel("Accuracy Metrics",
         layout_columns(
             col_widths = c(9, 3),
             uiOutput("best_boxes"),
@@ -126,7 +116,7 @@ ui <- page_navbar(
         card(
             card_header(textOutput("future_title", inline = TRUE)),
             plotOutput("future_plot", height = "auto"),
-            card_footer("Models are refitted on all data in the selected date range before forecasting, so automatically chosen forms can differ slightly from the Model specs tab.")
+            card_footer("Models are refitted on all data in the selected date range before forecasting, so automatically chosen forms can differ slightly from the Model Specifications tab.")
         )
     ),
 
@@ -152,7 +142,7 @@ ui <- page_navbar(
 5. **Forecast** *h* months ahead after refitting on all selected data, with prediction intervals.
 
 ### Reproducing a figure
-Every figure is determined by the sidebar settings. Set them, click **Fit models**, and open the tab.
+Every figure is determined by the sidebar settings. Set them, click **Fit Models**, and open the tab.
 
 ### Built with
 R, shiny, bslib, fable, feasts, tsibble and ggplot2.
@@ -188,8 +178,8 @@ server <- function(input, output, session) {
     # (ignoreNULL = FALSE also runs it once when the app starts)
     results <- eventReactive(input$fit, {
         validate(
-            need(length(input$varietals) > 0, "Select at least one varietal, then click Fit models."),
-            need(length(input$models) > 0, "Select at least one model, then click Fit models.")
+            need(length(input$varietals) > 0, "Select at least one varietal, then click Fit Models."),
+            need(length(input$models) > 0, "Select at least one model, then click Fit Models.")
         )
 
         data  <- filter_wines(wines, input$varietals, input$dates[1], input$dates[2])
@@ -241,13 +231,6 @@ server <- function(input, output, session) {
             labs(x = NULL, y = "Sales (thousands of litres)") +
             theme_minimal() +
             theme(legend.position = "none")
-    }, res = 96)
-
-    output$season_plot <- renderPlot({
-        selected_data() |>
-            ggtime::gg_season(Sales) +
-            labs(x = NULL, y = "Sales (thousands of litres)") +
-            theme_minimal()
     }, res = 96)
 
     # ---- Model specs tab ----
