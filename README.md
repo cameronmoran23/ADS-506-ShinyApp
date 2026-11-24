@@ -1,6 +1,6 @@
 # Australian Wine Forecaster
 
-This repository contains the code for a Shiny app. It compares and selects forecasting models for monthly Australian wine sales by varietal. It fits TSLM, ETS and ARIMA models to each selected varietal and scores them on a held-out validation window. It also forecasts ahead with prediction intervals (80% or 95%)
+This repository contains the code for a Shiny app. It compares and selects forecasting models for monthly Australian wine sales by varietal. It fits TSLM, ETS and ARIMA models to each selected varietal and scores them on a held-out validation window. It also forecasts ahead with prediction intervals (80% or 95%).
 
 Built for ADS 506 (Applied Time Series Analysis) - Module 5
 
@@ -13,6 +13,7 @@ Built for ADS 506 (Applied Time Series Analysis) - Module 5
 - app.R - R file that contains the shiny app logic
 - R/modeling.R - contains the backend logic for the shiny app
 - data/AustralianWines.csv - contains the dataset
+- Week5_Moran_Cameron.qmd - Data Story and app features qmd file
 
 ## App Features
 
@@ -33,4 +34,6 @@ shiny::runApp()
 
 All file paths are relative to the project folder, so the app must be run from there.
 
+## Acknowledgements
 
+The code in this repository was developed with the help of Claude Code by Anthropic.
