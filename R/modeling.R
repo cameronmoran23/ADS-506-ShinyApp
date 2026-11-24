@@ -91,11 +91,41 @@ fit_models <- function(train, models = c("TSLM", "ETS", "ARIMA"), log_transform 
 
 # forecast the validation data for the fitted models
 forecast_validation <- function(fitted_models, valid) {
+    # forecast the validation data
     forecast(fitted_models, new_data = valid)
 }
 
 # refit on selected data and forecast the next h months
 forecast_future <- function(data, models, log_transform = FALSE, h = 12) {
     fit_models(data, models, log_transform) |>
+        # predict next h months (default to 12 months)
         forecast(h = h)
+}
+
+# STEP 5: Evaluate
+
+# evaluate the performance of the fitted models on the training and validation sets
+evaluate_models <- function(fitted_models, fc_valid, data) {
+    # training data metrics
+    train_metrics <- accuracy(fitted_models) |>
+        mutate(Window = "Training")
+    # validation data metrics
+    valid_metrics <- accuracy(fc_valid, data) |>
+        mutate(Window = "Validation")
+    # combine the metrics into a single dataframe and select RMSE, MAE, and MAPE columns
+    bind_rows(train_metrics, valid_metrics) |>
+        select(Varietal, Model = .model, Window, RMSE, MAE, MAPE)
+}
+
+# find the best model per varietal based on the specified metric (default to RMSE)
+best_models <- function(metrics, metric = "RMSE") {
+    metrics |>
+        # filter for validation window
+        filter(Window == "Validation") |>
+        # group by varietal
+        group_by(Varietal) |>
+        # select minimum value of the metric
+        slice_min(.data[[metric]], n = 1, with_ties = FALSE) |>
+        # remove the grouping by varietal
+        ungroup()
 }
