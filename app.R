@@ -4,6 +4,7 @@ library(shiny)
 library(bslib)
 library(bsicons)
 library(fpp3)
+library(urca)
 
 # initialize constants/settings
 wines     <- load_wines()
