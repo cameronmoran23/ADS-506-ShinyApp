@@ -164,3 +164,18 @@ spec_table <- function(fitted_models) {
         left_join(aicc, by = c("Varietal", "Model")) |>
         mutate(Specification = if_else(Model == "TSLM", "TSLM: trend + season", Specification))
 }
+
+# STEP 7: Visualize
+
+# forecasts with prediction-interval ribbons
+# fc: a fable (from forecast_validation or forecast_future)
+# history: the actual data to draw behind the forecasts
+# layout: "side" = one column per model, "overlay" = all models in one panel per varietal
+plot_forecasts <- function(forecasts, history, level = 95) {
+    forecasts |>
+        autoplot(history, level = level) +
+        facet_grid(Varietal ~ .model, scales = "free_y") +
+        labs(x = NULL, y = "Sales (thousands of litres)", colour = "Model", fill = "Model") +
+        theme_minimal() +
+        theme(legend.position = "bottom")
+}
