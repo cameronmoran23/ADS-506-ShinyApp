@@ -1,6 +1,6 @@
 ---
 title: "ADS 506 — Week 5 Submission: Storytelling with Shiny"
-author: "Your Name"
+author: "Cameron Moran"
 date: today
 format:
   pdf:

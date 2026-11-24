@@ -94,11 +94,11 @@ ui <- page_navbar(
         layout_columns(
             card(
                 card_header("Validation Metrics"),
-                tableOutput("valid_table"),
+                tableOutput("valid_table")
             ),
             card(
                 card_header("Training Metrics"),
-                tableOutput("train_table"),
+                tableOutput("train_table")
             )
         ),
         p(class = "small text-muted",
@@ -114,7 +114,7 @@ ui <- page_navbar(
         ),
         card(
             card_header(textOutput("future_title", inline = TRUE)),
-            plotOutput("future_plot", height = "auto"),
+            plotOutput("future_plot", height = "auto")
         )
     ),
 
