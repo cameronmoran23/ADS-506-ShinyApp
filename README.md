@@ -4,7 +4,7 @@ This repository contains the code for a Shiny app. It compares and selects forec
 
 Built for ADS 506 (Applied Time Series Analysis) - Module 5
 
-**Live App URL:** <FILL IN>
+**Live App URL:** https://cameronmoran23.shinyapps.io/aus-wine-forecaster/ 
 
 ## Organization
 
