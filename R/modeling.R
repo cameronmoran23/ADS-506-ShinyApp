@@ -135,7 +135,7 @@ best_models <- function(metrics, metric = "RMSE") {
 # output one row per varietal and model
 spec_table <- function(fitted_models) {
     # format from wide to long to get one row per varietal and model
-    specs <- fitted_models |>
+    model_specs <- fitted_models |>
         pivot_longer(-Varietal, names_to = "Model", values_to = "Fit") |>
         as_tibble() |>
         mutate(Specification = sapply(Fit, model_sum)) |>
