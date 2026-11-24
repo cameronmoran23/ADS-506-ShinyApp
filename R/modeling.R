@@ -129,3 +129,38 @@ best_models <- function(metrics, metric = "RMSE") {
         # remove the grouping by varietal
         ungroup()
 }
+
+# STEP 6: Model specifications
+
+# output one row per varietal and model
+spec_table <- function(fitted_models) {
+    # format from wide to long to get one row per varietal and model
+    specs <- fitted_models |>
+        pivot_longer(-Varietal, names_to = "Model", values_to = "Fit") |>
+        as_tibble() |>
+        mutate(Specification = sapply(Fit, model_sum)) |>
+        select(Varietal, Model, Specification)
+
+    # gather key parameters: smoothing weights (ETS), coefficients (ARIMA), trend slope (TSLM)
+    params <- tidy(fitted_models) |>
+        filter(
+            # get alpha, beta, gamma, phi terms for ETS, ARIMA coefficients, and trend term for TSLM
+            (.model == "ETS"   & term %in% c("alpha", "beta", "gamma", "phi")) |
+            (.model == "ARIMA") |
+            (.model == "TSLM"  & term == "trend()")
+        ) |>
+        # group by varietal and model, then combine into a single string of key parameters
+        group_by(Varietal, Model = .model) |>
+        summarise(`Key parameters` = paste0(term, " = ", round(estimate, 3), collapse = ", "),
+                  .groups = "drop")
+
+    # calculate AICc for each model and select the relevant columns
+    aicc <- glance(fitted_models) |>
+        select(Varietal, Model = .model, AICc)
+
+    # join the three pieces together into one table
+    models_specs |>
+        left_join(params, by = c("Varietal", "Model")) |>
+        left_join(aicc, by = c("Varietal", "Model")) |>
+        mutate(Specification = if_else(Model == "TSLM", "TSLM: trend + season", Specification))
+}
